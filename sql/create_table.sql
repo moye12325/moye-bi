@@ -1,10 +1,10 @@
 # 数据库初始化
 
 -- 创建库
-create database if not exists my_db;
+create database if not exists moyeBi;
 
 -- 切换库
-use my_db;
+use moyeBi;
 
 -- 用户表
 create table if not exists user
