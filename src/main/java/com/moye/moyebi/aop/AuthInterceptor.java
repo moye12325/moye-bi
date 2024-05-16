@@ -4,11 +4,12 @@ import com.moye.moyebi.common.ErrorCode;
 import com.moye.moyebi.exception.BusinessException;
 import com.moye.moyebi.model.entity.User;
 import com.moye.moyebi.model.enums.UserRoleEnum;
-import com.moye.moyebi.service.UserService;
 import com.moye.moyebi.annotation.AuthCheck;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import com.moye.moyebi.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

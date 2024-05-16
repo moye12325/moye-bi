@@ -10,12 +10,13 @@ import com.moye.moyebi.manager.CosManager;
 import com.moye.moyebi.model.dto.file.UploadFileRequest;
 import com.moye.moyebi.model.entity.User;
 import com.moye.moyebi.model.enums.FileUploadBizEnum;
-import com.moye.moyebi.service.UserService;
 
 import java.io.File;
 import java.util.Arrays;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import com.moye.moyebi.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -18,7 +18,7 @@ spring:
   # todo 需替换配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/moyeBi
+    url: jdbc:mysql://localhost:3306/moyebi
     username: root
     password: root
   # Redis 配置
@@ -77,4 +77,4 @@ knife4j:
       default:
         api-rule: package
         api-rule-resources:
-          - com.moye.springbootinit.controller
+          - com.moye.moyebi.controller

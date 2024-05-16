@@ -13,11 +13,12 @@ import com.moye.moyebi.model.entity.User;
 import com.moye.moyebi.model.vo.PostVO;
 import com.moye.moyebi.service.PostFavourService;
 import com.moye.moyebi.service.PostService;
-import com.moye.moyebi.service.UserService;
 import com.moye.moyebi.exception.ThrowUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import com.moye.moyebi.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

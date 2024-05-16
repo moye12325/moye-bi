@@ -1,19 +1,20 @@
 package com.moye.moyebi.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.moye.moyebi.model.dto.user.UserQueryRequest;
 import com.moye.moyebi.model.entity.User;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.moye.moyebi.model.vo.LoginUserVO;
 import com.moye.moyebi.model.vo.UserVO;
-import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
- * 用户服务
- *
- *
- */
+* @author 19423
+* @description 针对表【user(用户)】的数据库操作Service
+* @createDate 2024-05-16 15:19:18
+*/
 public interface UserService extends IService<User> {
 
     /**
@@ -35,7 +36,6 @@ public interface UserService extends IService<User> {
      * @return 脱敏后的用户信息
      */
     LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request);
-
 
     /**
      * 获取当前登录用户
