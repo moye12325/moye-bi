@@ -2,6 +2,14 @@ spring:
   application:
     name: moye-bi
   # 默认 dev 环境
+  spark:
+    appid: ${spring.spark.appid}
+    apikey: ${spring.spark.apikey}
+    apiSecret: ${spring.spark.apiSecret}
+  openai:
+    model: ${spring.openai.chat.options.model}
+    apiKey: ${spring.openai.api-key}
+
   profiles:
     active: dev
   # 支持 swagger3
