@@ -83,7 +83,7 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart>
         chart.setGenChart(genChart);
         chart.setGenResult(genResult);
         chart.setUserId(loginUser.getId());
-        chart.setStatus(ChartStatusEnum.SUCCEED.getValue());
+        chart.setStatus("succeed");
         boolean saveResult = this.save(chart);
         ThrowUtils.throwIf(!saveResult, ErrorCode.SYSTEM_ERROR, "图表保存失败");
         // 封装返回结果

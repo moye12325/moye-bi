@@ -4,6 +4,37 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moye.moyebi.mapper.ChartMapper">
 
+    <!--    <resultMap id="BaseResultMap" type="com.moye.moyebi.model.entity.Chart">-->
+    <!--        <id property="id" column="id" jdbcType="BIGINT"/>-->
+    <!--        <result property="name" column="name" jdbcType="VARCHAR"/>-->
+    <!--        <result property="goal" column="goal" jdbcType="VARCHAR"/>-->
+    <!--        <result property="chartData" column="chartData" jdbcType="VARCHAR"/>-->
+    <!--        <result property="chartType" column="chartType" jdbcType="VARCHAR"/>-->
+    <!--        <result property="genChart" column="genChart" jdbcType="VARCHAR"/>-->
+    <!--        <result property="genResult" column="genResult" jdbcType="VARCHAR"/>-->
+    <!--        <result property="userId" column="userId" jdbcType="BIGINT"/>-->
+    <!--        <result property="status" column="status" jdbcType="TINYINT"/>-->
+    <!--        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>-->
+    <!--        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>-->
+    <!--        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>-->
+    <!--    </resultMap>-->
+
+<!--    <resultMap id="BaseResultMap" type="com.moye.moyebi.model.entity.Chart">-->
+<!--        <id column="id" property="id" jdbcType="BIGINT"/>-->
+<!--        <result column="goal" property="goal" jdbcType="LONGVARCHAR"/>-->
+<!--        <result column="name" property="name" jdbcType="VARCHAR"/>-->
+<!--        <result column="chartData" property="chartData" jdbcType="LONGVARCHAR"/>-->
+<!--        <result column="chartType" property="chartType" jdbcType="VARCHAR"/>-->
+<!--        <result column="genChart" property="genChart" jdbcType="LONGVARCHAR"/>-->
+<!--        <result column="genResult" property="genResult" jdbcType="LONGVARCHAR"/>-->
+<!--        <result column="status" property="status" jdbcType="VARCHAR"/>-->
+<!--        <result column="execMessage" property="execMessage" jdbcType="LONGVARCHAR"/>-->
+<!--        <result column="userId" property="userId" jdbcType="BIGINT"/>-->
+<!--        <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>-->
+<!--        <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>-->
+<!--        <result column="isDelete" property="isDelete" jdbcType="TINYINT"/>-->
+<!--    </resultMap>-->
+
     <resultMap id="BaseResultMap" type="com.moye.moyebi.model.entity.Chart">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="name" column="name" jdbcType="VARCHAR"/>
@@ -13,22 +44,20 @@
         <result property="genChart" column="genChart" jdbcType="VARCHAR"/>
         <result property="genResult" column="genResult" jdbcType="VARCHAR"/>
         <result property="userId" column="userId" jdbcType="BIGINT"/>
-        <result property="status" column="status" jdbcType="TINYINT"/>
         <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
         <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
     </resultMap>
 
+
     <sql id="Base_Column_List">
-        id
-        ,goal,name,chartData,
-        chartType,genChart,genResult,
-        userId,status,createTime,updateTime,
-        isDelete
+        id,`name`,goal,chartData,
+        chartType,genChart,genResult,userId,
+        createTime,updateTime,isDelete
     </sql>
 
-<!--    <select id="queryChartData" parameterType="string" resultType="map">-->
-<!--        ${querySql}-->
-<!--    </select>-->
+<!--        <select id="queryChartData" parameterType="string" resultType="map">-->
+<!--            ${querySql}-->
+<!--        </select>-->
 
 </mapper>

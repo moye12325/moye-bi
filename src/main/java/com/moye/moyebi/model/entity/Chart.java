@@ -67,7 +67,7 @@ public class Chart implements Serializable {
     /**
      * 任务状态
      */
-    private Integer status;
+    private String status;
 
 
     /**
