@@ -6,10 +6,11 @@ import org.redisson.api.RRateLimiter;
 import org.redisson.api.RateIntervalUnit;
 import org.redisson.api.RateType;
 import org.redisson.api.RedissonClient;
-import org.redisson.client.RedisClient;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
+@Component
 public class RedisLimiterManager {
 
     @Resource
