@@ -16,6 +16,7 @@ import com.moye.moyebi.constant.CommonConstant;
 import com.moye.moyebi.constant.UserConstant;
 import com.moye.moyebi.exception.BusinessException;
 import com.moye.moyebi.exception.ThrowUtils;
+import com.moye.moyebi.manager.RedisLimiterManager;
 import com.moye.moyebi.model.dto.chart.*;
 import com.moye.moyebi.model.entity.Chart;
 import com.moye.moyebi.model.entity.User;
@@ -57,6 +58,9 @@ public class ChartController {
 
     @Resource
     private OpenaiService openaiService;
+
+    @Resource
+    private RedisLimiterManager redisLimiterManager;
 
     public static final Integer SYNCHRO_MAX_TOKEN = 340;
 
@@ -373,7 +377,8 @@ public class ChartController {
         ThrowUtils.throwIf(!validFileSuffix.contains(suffix), ErrorCode.PARAMS_ERROR, "文件后缀非法");
 
         // 每个用户限流
-//        redisLimiterManager.doRateLimit("genChartByAi" + loginUser.getId());
+        redisLimiterManager.doRateLimit("genChartByGpt35" + loginUser.getId());
+
         // 构造用户输入
         StringBuilder userInput = new StringBuilder();
         userInput.append("分析需求：\n");
