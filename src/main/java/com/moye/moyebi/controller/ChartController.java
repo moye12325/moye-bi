@@ -192,6 +192,31 @@ public class ChartController {
         return ResultUtils.success(chartPage);
     }
 
+    /**
+     * 分页获取当前用户创建的资源列表
+     *
+     * @param chartQueryRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/my/list/page/vo")
+    public BaseResponse<Page<Chart>> listMyChartByPageVO(@RequestBody ChartQueryRequest chartQueryRequest,
+                                                       HttpServletRequest request) {
+        if (chartQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        chartQueryRequest.setUserId(loginUser.getId());
+        long current = chartQueryRequest.getCurrent();
+        long size = chartQueryRequest.getPageSize();
+        // 限制爬虫
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        Page<Chart> chartPage = chartService.page(new Page<>(current, size),
+                getQueryWrapper(chartQueryRequest));
+        return ResultUtils.success(chartPage);
+    }
+
+
     // endregion
 
 
@@ -261,7 +286,7 @@ public class ChartController {
      * @param request
      * @return
      */
-    @PostMapping("/gen")
+    @PostMapping("/genByAi")
     public String genChartByAi(@RequestPart("file") MultipartFile multipartFile,
                                GenChartByAiRequest genChartByAiRequest, HttpServletRequest request) {
 
@@ -311,9 +336,9 @@ public class ChartController {
      * @param request
      * @return
      */
-    @PostMapping("/gen2")
+    @PostMapping("/genBySpark")
     public BaseResponse<BiResponse> genChartBySparkLLM(@RequestPart("file") MultipartFile multipartFile,
-                                                  GenChartByAiRequest genChartByAiRequest, HttpServletRequest request) {
+                                                       GenChartByAiRequest genChartByAiRequest, HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         BiResponse result = chartService.genChartBySpark(multipartFile, genChartByAiRequest, loginUser);
         return ResultUtils.success(result);
@@ -328,9 +353,9 @@ public class ChartController {
      * @param request
      * @return
      */
-    @PostMapping("/gen3")
+    @PostMapping("/gen")
     public BaseResponse<BiResponse> genChartByGpt35(@RequestPart("file") MultipartFile multipartFile,
-                                                 GenChartByAiRequest genChartByAiRequest, HttpServletRequest request) {
+                                                    GenChartByAiRequest genChartByAiRequest, HttpServletRequest request) {
         String name = genChartByAiRequest.getName();
         String goal = genChartByAiRequest.getGoal();
         String chartType = genChartByAiRequest.getChartType();
@@ -370,7 +395,7 @@ public class ChartController {
         BiResponse biResponse = new BiResponse();
         Chart chart = new Chart();
         // 数据规模校验 gpt3.5分析时长超过30s
-        if (userData.length() > SYNCHRO_MAX_TOKEN){
+        if (userData.length() > SYNCHRO_MAX_TOKEN) {
             biResponse.setGenChart("");
             biResponse.setGenResult("large_size");
             biResponse.setChartId(chart.getId());
@@ -399,16 +424,16 @@ public class ChartController {
         JsonObject chartJson = JsonParser.parseString(genChart).getAsJsonObject();
 
         // 自动加入图表名称结尾并设置图表名称
-        if (StringUtils.isEmpty(name)){
+        if (StringUtils.isEmpty(name)) {
             String genChartName = String.valueOf(chartJson.getAsJsonObject("title").get("text"));
-            genChartName = genChartName.replace("\"","");
-            if ( !genChartName.endsWith("图") && !genChartName.endsWith("表") && !genChartName.endsWith("图表"))
+            genChartName = genChartName.replace("\"", "");
+            if (!genChartName.endsWith("图") && !genChartName.endsWith("表") && !genChartName.endsWith("图表"))
                 genChartName = genChartName + "图";
             chart.setName(genChartName);
         } else
             chart.setName(name);
         // 自动添加图表类型
-        if (StringUtils.isEmpty(chartType)){
+        if (StringUtils.isEmpty(chartType)) {
             JsonArray seriesArray = chartJson.getAsJsonArray("series");
             if (seriesArray.size() > 0) {
                 JsonObject firstSeries = seriesArray.get(0).getAsJsonObject();
@@ -416,7 +441,7 @@ public class ChartController {
                 String CnChartType = chartService.getChartTypeToCN(typeChart);
                 chart.setChartType(CnChartType);
             }
-        }else
+        } else
             chart.setChartType(chartType);
         // 加入下载按钮
         JsonObject toolbox = new JsonObject();
@@ -436,10 +461,10 @@ public class ChartController {
         chart.setGenChart(updatedGenChart);
         chart.setGenResult(genResult);
         chart.setUserId(loginUser.getId());
-        chart.setStatus(1);
+        chart.setStatus("succeed");
         boolean saveResult = chartService.save(chart);
         if (!saveResult)
-            handleChartUpdateError(chart.getId(),"图表信息保存失败");
+            handleChartUpdateError(chart.getId(), "图表信息保存失败");
         biResponse.setGenChart(updatedGenChart);
         biResponse.setGenResult(genResult);
         biResponse.setChartId(chart.getId());
@@ -451,10 +476,10 @@ public class ChartController {
      * @param chartId
      * @param execMessage
      */
-    private void handleChartUpdateError(long chartId, String execMessage){
+    private void handleChartUpdateError(long chartId, String execMessage) {
         Chart updateChart = new Chart();
         updateChart.setId(chartId);
-        updateChart.setStatus(1);
+        updateChart.setStatus("succeed");
 //        updateChart.setExecMessage(execMessage);
         boolean b = chartService.updateById(updateChart);
         if (!b)
