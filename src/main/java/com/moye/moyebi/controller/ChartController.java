@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.*;
 import com.moye.moyebi.annotation.AuthCheck;
+import com.moye.moyebi.bizmq.BiMessageConsumer;
+import com.moye.moyebi.bizmq.BiMessageProducer;
 import com.moye.moyebi.common.BaseResponse;
 import com.moye.moyebi.common.DeleteRequest;
 import com.moye.moyebi.common.ErrorCode;
@@ -63,9 +65,16 @@ public class ChartController {
     @Resource
     private RedisLimiterManager redisLimiterManager;
 
-    public static final Integer SYNCHRO_MAX_TOKEN = 340;
     @Autowired
     private ThreadPoolExecutor threadPoolExecutor;
+
+    @Resource
+    private BiMessageConsumer biMessageConsumer;
+
+    public static final Integer SYNCHRO_MAX_TOKEN = 340;
+    @Autowired
+    private BiMessageProducer biMessageProducer;
+
 
     // region 增删改查
 
@@ -495,7 +504,7 @@ public class ChartController {
      * @param request
      * @return
      */
-    @PostMapping("/gen/async/mq")
+    @PostMapping("/gen/async")
     public BaseResponse<BiResponse> genChartByGpt35Async(@RequestPart("file") MultipartFile multipartFile,
                                                          GenChartByAiRequest genChartByAiRequest, HttpServletRequest request) {
         String name = genChartByAiRequest.getName();
@@ -645,6 +654,84 @@ public class ChartController {
 
         return ResultUtils.success(biResponse);
     }
+
+    /**
+     * 文件AI分析  chatgpt 异步MQ分析
+     *
+     * @param multipartFile
+     * @param genChartByAiRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/gen/async/mq")
+    public BaseResponse<BiResponse> genChartByGpt35AsyncMQ(@RequestPart("file") MultipartFile multipartFile,
+                                                         GenChartByAiRequest genChartByAiRequest, HttpServletRequest request) {
+        String name = genChartByAiRequest.getName();
+        String goal = genChartByAiRequest.getGoal();
+        String chartType = genChartByAiRequest.getChartType();
+
+        // 校验上传
+        ThrowUtils.throwIf(StringUtils.isNotBlank(name) && name.length() > 100, ErrorCode.PARAMS_ERROR, "名称过长");
+        User loginUser = userService.getLoginUser(request);
+
+        // 校验文件大小及后缀
+        long size = multipartFile.getSize();
+        final long TEN_MB = 10 * 1024 * 1024L;
+        ThrowUtils.throwIf(size > TEN_MB, ErrorCode.PARAMS_ERROR, "文件大小大于1M");
+        String fileName = multipartFile.getOriginalFilename();
+        String suffix = FileUtil.getSuffix(fileName);
+        final List<String> validFileSuffix = Arrays.asList("xlsx", "csv", "xls");
+        ThrowUtils.throwIf(!validFileSuffix.contains(suffix), ErrorCode.PARAMS_ERROR, "文件后缀非法");
+
+        // 限流判断，每个用户一个限流器
+        redisLimiterManager.doRateLimit("genChartByGpt35" + loginUser.getId());
+
+        // 构造用户输入
+        StringBuilder userInput = new StringBuilder();
+        userInput.append("分析需求：\n");
+
+        // 拼接分析目标
+        String userGoal = "请帮我合理的分析一下数据";
+        if (StringUtils.isNotBlank(goal))
+            userGoal = goal;
+
+        // 分析输入加入图表类型
+        if (StringUtils.isNotBlank(chartType))
+            userGoal += ",请使用" + chartType;
+        userInput.append(userGoal).append("\n");
+        userInput.append("原始数据：\n");
+
+        // 压缩数据
+        String userData = "";
+        if (Objects.equals(suffix, "csv"))
+            userData = Csv2String.MultipartFileToString(multipartFile);
+        else
+            userData = ExcelUtils.excelToCsv(multipartFile);
+
+        // 插入数据库
+        Chart chart = new Chart();
+        chart.setStatus("wait");
+        chart.setGoal(userGoal);
+        chart.setChartData(userData);
+        if (!StringUtils.isEmpty(name))
+            chart.setName(name);
+        if (!StringUtils.isEmpty(chartType))
+            chart.setChartType(chartType);
+        chart.setUserId(loginUser.getId());
+        boolean saveResult = chartService.save(chart);
+        if (!saveResult)
+            handleChartUpdateError(chart.getId(), "图表初始数据保存失败");
+
+        // ------------以上通用代码--------------
+
+        long newChartId = chart.getId();
+        biMessageProducer.sendMessage(String.valueOf(newChartId));
+        BiResponse biResponse = new BiResponse();
+        biResponse.setChartId(newChartId);
+        return ResultUtils.success(biResponse);
+
+    }
+
 
     /**
      * 图表错误状态处理

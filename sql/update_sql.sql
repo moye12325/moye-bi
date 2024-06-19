@@ -1,6 +1,10 @@
 -- 切换库
 USE moyebi;
 
+ALTER TABLE chart
+    ADD COLUMN retry INT DEFAULT 0 NOT NULL COMMENT '图表分析重试次数';
+
+
 -- 更新用户表
 ALTER TABLE user
     MODIFY COLUMN id BIGINT AUTO_INCREMENT COMMENT 'id',

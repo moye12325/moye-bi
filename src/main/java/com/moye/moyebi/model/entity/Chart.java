@@ -69,6 +69,17 @@ public class Chart implements Serializable {
      */
     private String status;
 
+    /**
+     * 重试次数
+     */
+    private Integer retry;
+
+
+    /**
+     * 执行信息
+     */
+    private String execMessage;
+
 
     /**
      * 是否删除
